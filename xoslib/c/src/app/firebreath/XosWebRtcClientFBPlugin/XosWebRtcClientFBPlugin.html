@@ -1,0 +1,239 @@
+<!--================================================================================-->
+<!-- Copyright 2013, Google Inc.                                                    -->
+<!--                                                                                -->
+<!-- Redistribution and use in source and binary forms, with or without             -->
+<!-- modification, are permitted provided that the following conditions are met:    -->
+<!--                                                                                -->
+<!--  1. Redistributions of source code must retain the above copyright notice,     -->
+<!--     this list of conditions and the following disclaimer.                      -->
+<!--  2. Redistributions in binary form must reproduce the above copyright notice,  -->
+<!--     this list of conditions and the following disclaimer in the documentation  -->
+<!--     and/or other materials provided with the distribution.                     -->
+<!--  3. The name of the author may not be used to endorse or promote products      -->
+<!--     derived from this software without specific prior written permission.      -->
+<!--                                                                                -->
+<!-- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED   -->
+<!-- WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF           -->
+<!-- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO     -->
+<!-- EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,         -->
+<!-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,   -->
+<!-- PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;    -->
+<!-- OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,       -->
+<!-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR        -->
+<!-- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF         -->
+<!-- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                     -->
+<!--                                                                                -->
+<!--   File: XosWebRtcClientFBPlugin.html                                           -->
+<!--                                                                                -->
+<!-- Author: $author$                                                               -->
+<!--   Date: 4/4/2012                                                               -->
+<!--================================================================================-->
+<html>
+    <!--========================================================================-->
+    <!--                                                                        -->
+    <!-- head                                                                   -->
+    <!--                                                                        -->
+    <!--========================================================================-->
+    <head>
+        <title>XosWebRtcFBPlugin</title>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- style                                                                  -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <style
+         type="text/css">
+            object
+            {
+                border: 5px solid gray;
+                text-align: center;
+                margin: 0 auto;
+                float: left;
+                width: 100%;
+                height: 100%;
+            }
+            table.full
+            {
+                width: 100%;
+                height: 100%;
+            }
+            tr.full
+            {
+                height: 100%;
+            }
+            td.full
+            {
+                width: 100%;
+            }
+        </style>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- script                                                                 -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <script
+         language="JavaScript"
+         type="text/JavaScript">
+            function get_formParameter(name)
+            {
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                var regexS = "[\\?&]" + name + "=([^&#]*)";
+                var regex = new RegExp(regexS);
+                var results = regex.exec(window.location.href);
+                if (results != null)
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                return "";
+            }
+            function add_eventListener(name, listener)
+            {
+                if (plugin().addEventListener)
+                    plugin().addEventListener(name, listener);
+                else
+                plugin().attachEvent("on" + name, listener);
+            }
+        </script>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- script                                                                 -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <script
+         language="JavaScript"
+         type="text/JavaScript">
+            function on_load()
+            {
+                get_formParameters();
+                add_eventListeners();
+            }
+            function get_formParameters()
+            {
+                id_videoCodecMode().value = plugin().videoCodecMode;
+            }
+            function add_eventListeners()
+            {
+                add_eventListener("FailedToConnectToServer", on_FailedToConnectToServer);
+                add_eventListener("SignedIn", on_SignedIn);
+                add_eventListener("Event", on_Event);
+                add_eventListener("PeerOnline", on_PeerOnline);
+                add_eventListener("PeerOffline", on_PeerOffline);
+                add_eventListener("RemotePeerCall", on_RemotePeerCall);
+                add_eventListener("RemotePeerHangup", on_RemotePeerHangup);
+            }
+            function add_eventListener(name, listener) {
+                if (plugin().addEventListener)
+                    plugin().addEventListener(name, listener);
+                else
+                    plugin().attachEvent("on" + name, listener);
+            }
+
+            function on_FailedToConnectToServer(server) {
+                alert("Failed to connect to server " + server);
+                return true;
+            }
+            function on_SignedIn(message) {
+                alert("SignedIn "+message);
+                return true;
+            }
+            function on_PeerOnline(message) {
+                alert("PeerOnline " + message);
+                return true;
+            }
+            function on_PeerOffline(message) {
+                alert("PeerOffline " + message);
+                return true;
+            }
+            function on_RemotePeerCall(message) {
+                alert("RemotePeerCall " + message);
+                return true;
+            }
+            function on_RemotePeerHangup(message) {
+                alert("RemotePeerHangup " + message);
+                return true;
+            }
+            function on_RendererAdd(message) {
+                alert("RendererAdd " + message);
+                return true;
+            }
+            function on_RendererRemove(message) {
+                alert("RendererRemove " + message);
+                return true;
+            }
+            function on_Event(message) {
+                alert("Event " + message);
+                return true;
+            }
+            
+            function connect_To_Server()
+            {
+                plugin().videoCodecMode = id_videoCodecMode().value;
+                plugin().Signin
+                (id_userName().value, id_serverName().value, id_serverPort().value);
+                return false;
+            }
+            function disconnect_Server() 
+            {
+                plugin().Signout();
+                id_videoCodecMode().value = plugin().videoCodecMode;
+                return false;
+            }
+
+            function id_userName()
+            { return document.getElementById("id_userName"); }
+            function id_serverName()
+            { return document.getElementById("id_serverName"); }
+            function id_serverPort()
+            { return document.getElementById("id_serverPort"); }
+            function id_videoCodecMode()
+            { return document.getElementById("id_videoCodecMode"); }
+
+            function form_userName()
+            { return document.getElementById("form_userName"); }
+            function form_serverName()
+            { return document.getElementById("form_serverName"); }
+            function form_serverPort()
+            { return document.getElementById("form_serverPort"); }
+            function form_videoCodecMode()
+            { return document.getElementById("form_videoCodecMode"); }
+
+            function pluginOuter() 
+            {
+                return document.getElementById("id_pluginOuter");
+            }
+            function plugin() 
+            {
+                return document.getElementById("plugin");
+            }
+        </script>
+    </head>
+    <!--========================================================================-->
+    <!--                                                                        -->
+    <!-- body                                                                   -->
+    <!--                                                                        -->
+    <!--========================================================================-->
+    <body>
+        <table class="full">
+            <tr class="full"><td id="id_pluginOuter" class="full">
+            <object id="plugin"
+             type="application/x-xoswebrtcclientfbplugin"
+             xwidth="480" xheight="480"
+             xxdrawingModel="NPDrawingModelInvalidatingCoreAnimation"
+             xdrawingModel="NPDrawingModelCoreAnimation"
+             drawingModel="NPDrawingModelCoreGraphics">
+                <param name="onload" value="on_load">
+             </object>
+            </td></tr>
+            <tr><td>
+            <form id="form" action="">
+                <input id="id_userName" name="form_userName" value="username" />
+                <input id="id_serverName" name="form_serverName" value="localhost" />
+                <input id="id_serverPort" name="form_serverPort" value="8888" />
+                <input id="id_videoCodecMode" name="form_videoCodecMode" value="" />
+                <input type="submit" value="+" onclick="return connect_To_Server();"/>
+                <input type="submit" value="-" onclick="return disconnect_Server();"/>
+            </form>
+            </td></tr>
+        </table>
+    </body>
+</html>
+        
+

@@ -1,0 +1,134 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN_ICON           ICON                    "XosWinWebRtcClient_ico.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MAIN_DIALOG DIALOGEX 0, 0, 320, 282
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
+CAPTION "XosWinDialogWindow"
+CLASS "XosWinDialogWindowClass"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Set",IDOK,243,6,50,14
+    PUSHBUTTON      "Get",IDCANCEL,243,23,50,14
+    RTEXT           "User Name",IDC_STATIC,11,11,83,10
+    EDITTEXT        IDC_EDIT_USER,99,8,135,12,ES_AUTOHSCROLL
+    RTEXT           "Server Name",IDC_STATIC,11,32,83,10
+    EDITTEXT        IDC_EDIT_SERVER,99,32,135,12,ES_AUTOHSCROLL
+    RTEXT           "Server Port",IDC_STATIC,11,48,83,10
+    EDITTEXT        IDC_EDIT_PORT,99,46,135,12,ES_AUTOHSCROLL
+    RTEXT           "Video Mode",IDC_STATIC,11,70,83,10
+    EDITTEXT        IDC_EDIT_MODE,99,68,135,12,ES_AUTOHSCROLL
+    RTEXT           "Video Width",IDC_STATIC,11,84,83,10
+    EDITTEXT        IDC_EDIT_WIDTH,99,83,135,12,ES_AUTOHSCROLL
+    RTEXT           "Video Height",IDC_STATIC,11,100,83,10
+    EDITTEXT        IDC_EDIT_HEIGHT,99,99,135,12,ES_AUTOHSCROLL
+    RTEXT           "Video Framerate",IDC_STATIC,11,116,83,10
+    EDITTEXT        IDC_EDIT_FRAME,99,115,135,12,ES_AUTOHSCROLL
+    RTEXT           "Video Min Bitrate",IDC_STATIC,11,134,83,10
+    EDITTEXT        IDC_EDIT_BIT,99,135,135,12,ES_AUTOHSCROLL
+    RTEXT           "Video Device",IDC_STATIC,11,152,83,10
+    EDITTEXT        IDC_EDIT_DEV,99,153,135,12,ES_AUTOHSCROLL
+    RTEXT           "Autoconnect",IDC_STATIC,11,174,83,10
+    CONTROL         "",IDC_CHECK_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,174,133,10
+    RTEXT           "Autoconnect After",IDC_STATIC,11,186,83,10
+    CONTROL         "",IDC_CHECK_AUTO2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,186,133,10
+    RTEXT           "Use OpenGL",IDC_STATIC,11,199,83,10
+    CONTROL         "",IDC_CHECK_GL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,199,133,10
+    RTEXT           "Alternate Server Addrs",IDC_STATIC,11,212,83,10
+    CONTROL         "",IDC_CHECK_ALT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,212,133,10
+    RTEXT           "Numeric Server Addrs",IDC_STATIC,11,225,83,10
+    CONTROL         "",IDC_CHECK_NUM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,225,133,10
+    RTEXT           "Use Relay Server",IDC_STATIC,11,238,83,10
+    CONTROL         "",IDC_CHECK_RELAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,99,238,133,10
+    RTEXT           "Stun Host",IDC_STATIC,11,251,83,10
+    EDITTEXT        IDC_EDIT_STUN_HOST,99,253,135,12,ES_AUTOHSCROLL
+    RTEXT           "Stun Port",IDC_STATIC,11,264,83,10
+    EDITTEXT        IDC_EDIT_STUN_PORT,99,266,135,12,ES_AUTOHSCROLL
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_MAIN_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 301
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,404 @@
+<!--================================================================================-->
+<!-- Copyright 2013, Google Inc.                                                    -->
+<!--                                                                                -->
+<!-- Redistribution and use in source and binary forms, with or without             -->
+<!-- modification, are permitted provided that the following conditions are met:    -->
+<!--                                                                                -->
+<!--  1. Redistributions of source code must retain the above copyright notice,     -->
+<!--     this list of conditions and the following disclaimer.                      -->
+<!--  2. Redistributions in binary form must reproduce the above copyright notice,  -->
+<!--     this list of conditions and the following disclaimer in the documentation  -->
+<!--     and/or other materials provided with the distribution.                     -->
+<!--  3. The name of the author may not be used to endorse or promote products      -->
+<!--     derived from this software without specific prior written permission.      -->
+<!--                                                                                -->
+<!-- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED   -->
+<!-- WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF           -->
+<!-- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO     -->
+<!-- EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,         -->
+<!-- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,   -->
+<!-- PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;    -->
+<!-- OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,       -->
+<!-- WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR        -->
+<!-- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF         -->
+<!-- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                     -->
+<!--                                                                                -->
+<!--   File: XosWebRtcClientFBPlugin.html                                           -->
+<!--                                                                                -->
+<!-- Author: $author$                                                               -->
+<!--   Date: 4/4/2012                                                               -->
+<!--================================================================================-->
+<html>
+    <!--========================================================================-->
+    <!--                                                                        -->
+    <!-- head                                                                   -->
+    <!--                                                                        -->
+    <!--========================================================================-->
+    <head>
+        <title>XosWebRtcFBPlugin</title>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- style                                                                  -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <style
+         type="text/css">
+            object
+            {
+                /*border: 5px solid gray;*/
+                text-align: center;
+                margin: 0 auto;
+                float: left;
+                /*width: 100%;
+                height: 100%;*/
+            }
+            table.full
+            {
+                width: 100%;
+                height: 100%;
+            }
+            tr.full
+            {
+                height: 100%;
+            }
+            td.full
+            {
+                width: 100%;
+            }
+        </style>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- script                                                                 -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <script
+         language="JavaScript"
+         type="text/JavaScript">
+            function get_formParameter(name)
+            {
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                var regexS = "[\\?&]" + name + "=([^&#]*)";
+                var regex = new RegExp(regexS);
+                var results = regex.exec(window.location.href);
+                if (results != null)
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                return "";
+            }
+            function add_eventListener(name, listener)
+            {
+                if (plugin().addEventListener)
+                    plugin().addEventListener(name, listener);
+                else
+                plugin().attachEvent("on" + name, listener);
+            }
+        </script>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- script                                                                 -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <script
+         language="JavaScript"
+         type="text/JavaScript">
+            function on_load()
+            {
+                get_formParameters();
+                add_eventListeners();
+            }
+            function get_formParameters() {
+                var width = plugin().videoCodecWidth;
+                var height = plugin().videoCodecHeight;
+                id_videoCodecMode().value = plugin().videoCodecMode;
+                if (width > 0) id_pluginWidth().value = width;
+                if (height > 0) id_pluginHeight().value = height;
+            }
+            function add_eventListeners()
+            {
+                add_eventListener("FailedToConnectToServer", on_FailedToConnectToServer);
+                add_eventListener("SignedIn", on_SignedIn);
+                add_eventListener("Event", on_Event);
+                add_eventListener("PeerOnline", on_PeerOnline);
+                add_eventListener("PeerOffline", on_PeerOffline);
+                add_eventListener("RemotePeerCall", on_RemotePeerCall);
+                add_eventListener("RemotePeerHangup", on_RemotePeerHangup);
+                add_eventListener("RendererAdd", on_RendererAdd);
+                add_eventListener("RendererRemove", on_RendererRemove);
+            }
+            function add_eventListener(name, listener) {
+                if (plugin().addEventListener)
+                    plugin().addEventListener(name, listener);
+                else
+                    plugin().attachEvent("on" + name, listener);
+            }
+
+            function on_FailedToConnectToServer(server) {
+                alert("Failed to connect to server " + server);
+                return true;
+            }
+            function on_SignedIn(message) {
+                alert("SignedIn " + message);
+                SignedIn(message);
+                return true;
+            }
+            function on_PeerOnline(message) {
+                alert("PeerOnline " + message);
+                PeerOnline(message);
+                return true;
+            }
+            function on_PeerOffline(message) {
+                alert("PeerOffline " + message);
+                PeerOffline(message);
+                return true;
+            }
+            function on_RemotePeerCall(message) {
+                alert("RemotePeerCall " + message);
+                RemotePeerCall(message);
+                return true;
+            }
+            function on_RemotePeerHangup(message) {
+                alert("RemotePeerHangup " + message);
+                RemotePeerHangup(message);
+                return true;
+            }
+            function on_RendererAdd(message) {
+                alert("RendererAdd " + message);
+                RendererAdd(message);
+                return true;
+            }
+            function on_RendererRemove(message) {
+                alert("RendererRemove " + message);
+                RendererRemove(message);
+                return true;
+            }
+            function on_Event(message) {
+                alert("Event " + message);
+                return true;
+            }
+            
+            function connect_To_Server()
+            {
+                plugin().videoCodecMode = id_videoCodecMode().value;
+                plugin().Signin
+                (id_userName().value, id_serverName().value, id_serverPort().value);
+                return false;
+            }
+            function disconnect_Server() 
+            {
+                plugin().Signout();
+                id_videoCodecMode().value = plugin().videoCodecMode;
+                return false;
+            }
+
+            function id_pluginWidth()
+            { return document.getElementById("id_pluginWidth"); }
+            function id_pluginHeight()
+            { return document.getElementById("id_pluginHeight"); }
+
+            function id_userName()
+            { return document.getElementById("id_userName"); }
+            function id_serverName()
+            { return document.getElementById("id_serverName"); }
+            function id_serverPort()
+            { return document.getElementById("id_serverPort"); }
+            function id_videoCodecMode()
+            { return document.getElementById("id_videoCodecMode"); }
+
+            function form_userName()
+            { return document.getElementById("form_userName"); }
+            function form_serverName()
+            { return document.getElementById("form_serverName"); }
+            function form_serverPort()
+            { return document.getElementById("form_serverPort"); }
+            function form_videoCodecMode()
+            { return document.getElementById("form_videoCodecMode"); }
+
+            function pluginOuter() 
+            {
+                return document.getElementById("id_pluginOuter");
+            }
+            function pluginWidth() {
+                return document.getElementById("id_pluginWidth");
+            }
+            function pluginHeight() {
+                return document.getElementById("id_pluginHeight");
+            }
+            function plugin() 
+            {
+                return document.getElementById("plugin");
+            }
+        </script>
+        <!--========================================================================-->
+        <!--                                                                        -->
+        <!-- script                                                                 -->
+        <!--                                                                        -->
+        <!--========================================================================-->
+        <script
+         language="JavaScript"
+         type="text/JavaScript">
+            var OnlinePeers = new Array();
+            var OnCallWithPeer = new Array();
+            var numRenderers = 0;
+
+            function ConnectToServer() {
+                connect_To_Server()
+                ShowPlugin();
+                return false;
+            }
+            function DisconnectServer() {
+                HidePlugin();
+                disconnect_Server();
+                LoadSigninPage();
+                return false;
+            }
+            function Signin() {
+                var userName = id_userName().value;
+                var serverIp = id_serverName().value;
+                var serverPort = id_serverPort().value;
+                plugin().Signin(userName, serverIp, serverPort);
+            }
+            function SignedIn(message) {
+                OnlinePeers = message.split(':');
+                OnlinePeers.splice((OnlinePeers.length - 1), 1);
+                for (i = 0; i < OnlinePeers.length; i++)
+                    OnCallWithPeer[OnlinePeers[i]] = false;
+                LoadCallPage();
+            }
+            function Signout() {
+                plugin().Signout();
+                HidePlugin();
+                LoadSigninPage();
+            }
+            function CallOrHangup(peername) {
+                if (false == OnCallWithPeer[peername]) {
+                    plugin().Call(peername);
+                    OnCallWithPeer[peername] = true;
+                    LoadCallPage();
+                }
+                else {
+                    plugin().Hangup(peername);
+                    HidePlugin();
+                    OnCallWithPeer[peername] = false;
+                    LoadCallPage();
+                }
+            }
+            function PeerOnline(message) {
+                OnlinePeers.push(message);
+                OnCallWithPeer[OnlinePeers[i]] = false;
+                LoadCallPage();
+            }
+            function PeerOffline(message) {
+                OnlinePeers.splice(OnlinePeers.indexOf(message), 1);
+                LoadCallPage();
+            }
+            function RemotePeerCall(message) {
+                OnCallWithPeer[message] = true; 
+                LoadCallPage();
+            }
+            function RemotePeerHangup(message) {
+                OnCallWithPeer[message] = false;
+                HidePlugin();
+                LoadCallPage();
+            }
+            function RendererAdd(message) {
+                var width = parseInt(plugin().width);
+                var height = parseInt(plugin().height);
+                var rendererDims = message.split(':');
+                if (numRenderers < 1) width = 0;
+                plugin().width = (width + parseInt(rendererDims[0]));
+                if (height < (parseInt(rendererDims[1])))
+                    plugin().height = (parseInt(rendererDims[1]));
+                numRenderers++;
+            }
+            function RendererRemove(message) {
+                var width = parseInt(pluginWidth().value);
+                var height = parseInt(pluginHeight().value);
+                var rendererDims = message.split(':');
+                numRenderers--;
+                plugin().width = (width - parseInt(rendererDims[0]));
+                if (plugin().width < 1)
+                    plugin().height = "0";
+            }
+            function LoadCallPage() {
+                var pageLocation = document.getElementById("pagelocation");
+                pageLocation.innerHTML = 'online peers:<br/>';
+
+                for (i = 0; i < OnlinePeers.length; i++) {
+                    pageLocation.innerHTML += OnlinePeers[i];
+
+                    if (false == OnCallWithPeer[OnlinePeers[i]]) {
+                        pageLocation.innerHTML += '<a href="#" onclick="javascript:CallOrHangup(\''
+                        + (OnlinePeers[i] + '\')">Call</a><br/>');
+                    }
+                    else {
+                        pageLocation.innerHTML += '<a href="#" onclick="javascript:CallOrHangup(\''
+                        + (OnlinePeers[i] + '\')">Hang Up</a><br/>');
+                    }
+                }
+                pageLocation.innerHTML += '<button id="signoutbutton" size="10" onclick="javascript:Signout()"/>Sign Out</button>';
+                numRenderers = 0;
+            }
+            function LoadSigninPage() {
+                var pageLocation = document.getElementById("pagelocation");
+                pageLocation.innerHTML = '<table><tr><td>\
+                <button id="signinbutton" size="10" onclick="javascript:Signin()">Sign In</button>\
+                </td></tr></table>';
+                numRenderers = 0;
+            }
+            function LoadErrorPage(errMsg) {
+                var pageLocation = document.getElementById("pagelocation");
+                pageLocation.innerHTML = errMsg;
+            }
+            function ShowPlugin() {
+                plugin().width = pluginWidth().value;
+                plugin().height = pluginHeight().value;
+            }
+            function HidePlugin() {
+                plugin().width = "0";
+                plugin().height = "0";
+            }
+            function OnLoadPlugin() {
+                on_load();
+                HidePlugin();
+                LoadSigninPage();
+            }
+        </script>
+    </head>
+    <!--========================================================================-->
+    <!--                                                                        -->
+    <!-- body                                                                   -->
+    <!--                                                                        -->
+    <!--========================================================================-->
+    <body>
+        <h1>WebRTC Video Chat</h1>
+        <table>
+            <tr><td>
+                <object 
+                 id="plugin"
+                 type="application/x-xoswebrtcclientfbplugin"
+                 width="1" height="1"
+                 drawingModel="NPDrawingModelCoreGraphics">
+                    <param name="onload" value="OnLoadPlugin">
+                </object>
+            </td></tr>
+            <tr><td>
+            <form id="form" action="">
+                <input id="id_pluginWidth" type="hidden" name="form_pluginWidth" value="640"/>
+                <input id="id_pluginHeight" type="hidden" name="form_pluginHeight" value="480"/>
+                <br />
+                <input id="id_userName" name="form_userName" value="username" />
+                <input id="id_serverName" name="form_serverName" value="localhost" />
+                <input id="id_serverPort" name="form_serverPort" value="8888" />
+                <input id="id_videoCodecMode" name="form_videoCodecMode" value="" />
+                <input type="submit" value="+" onclick="return ConnectToServer();"/>
+                <input type="submit" value="-" onclick="return DisconnectServer();"/>
+            </form>
+            </td></tr>
+            <tr><td>
+                <pre id="pagelocation">
+                </pre>
+            </td></tr>
+        </table>
+    </body>
+</html>
+        
+

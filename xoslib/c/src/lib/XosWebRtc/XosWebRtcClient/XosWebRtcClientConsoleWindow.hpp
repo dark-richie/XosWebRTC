@@ -1,0 +1,289 @@
+///////////////////////////////////////////////////////////////////////
+/// Copyright 2012, Google Inc.
+///
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+/// 
+///  1. Redistributions of source code must retain the above copyright notice,
+///     this list of conditions and the following disclaimer.
+///  2. Redistributions in binary form must reproduce the above copyright notice,
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
+///  3. The name of the author may not be used to endorse or promote products
+///     derived from this software without specific prior written permission.
+/// 
+/// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+/// WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+/// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+/// EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+/// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+/// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+/// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+/// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+/// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+/// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+///
+///   File: XosWebRtcClientConsoleWindow.hpp
+///
+/// Author: $author$
+///   Date: 4/2/2012
+///////////////////////////////////////////////////////////////////////
+#ifndef _XOSWEBRTCCLIENTCONSOLEWINDOW_HPP
+#define _XOSWEBRTCCLIENTCONSOLEWINDOW_HPP
+
+#include "XosWebRtcClientFBPluginWindow.hpp"
+#include "XosWebRtcClientConsolePeerWindow.hpp"
+#include "XosWebRtcClientConsoleBaseWindowUIMessageThread.hpp"
+
+#if defined(c_NAMESPACE)
+namespace c_NAMESPACE {
+#endif // defined(c_NAMESPACE) 
+
+typedef XosWebRtcClientFBPluginWindowImplement
+XosWebRtcClientConsoleWindowImplement;
+
+typedef XosWebRtcClientFBPluginWindowBaseT
+<XosWebRtcClientConsolePeerWindow>
+XosWebRtcClientConsoleWindowExtend;
+///////////////////////////////////////////////////////////////////////
+///  Class: XosWebRtcClientConsoleWindow
+///
+/// Author: $author$
+///   Date: 4/2/2012
+///////////////////////////////////////////////////////////////////////
+class _EXPORT_CLASS XosWebRtcClientConsoleWindow
+: virtual public XosWebRtcClientConsoleWindowImplement,
+  public XosWebRtcClientConsoleWindowExtend
+{
+public:
+    typedef XosWebRtcClientConsoleWindowImplement Implements;
+    typedef XosWebRtcClientConsoleWindowExtend Extends;
+
+    /*std::string m_webrtcClientTraceFileName;
+    std::string m_webrtcClientTraceFileDir;
+    std::string m_webrtcClientTraceFileEnv;
+    XosWebRtcClientTraceLevel m_webrtcClientTraceLevels;
+    XosWebRtcClientVideoCodecMode m_webrtcVideoVideoCodecMode;
+
+    XosWebRtcClientBaseWindowPeerImplement* m_windowPeer;
+    XosWebRtcClientSocketServer* m_socketServer;
+    XosWebRtcClientConnectorPair* m_clientPair;
+    XosWebRtcClientConsoleBaseWindowUIMessageThread m_msgThread;*/
+
+    XosWebRtcClientConsoleWindow
+    (const char* serverName, int serverPort,
+     bool showConnectionState=XOSWEBRTCCLIENTBASEWINDOW_DEFAULT_SHOW_CONNECTION_STATE,
+     bool handleButtonEvents=XOSWEBRTCCLIENTBASEWINDOW_DEFAULT_HANDLE_BUTTON_EVENTS)
+    : Extends(serverName, serverPort, showConnectionState, handleButtonEvents)/*,
+
+      m_webrtcClientTraceFileName
+      (XOSWEBRTCCLIENT_DEFAULT_WEBRTC_CLIENT_TRACE_FILENAME),
+
+      m_webrtcClientTraceFileDir
+      (XOSWEBRTCCLIENT_DEFAULT_WEBRTC_CLIENT_TRACE_FILEDIR),
+
+      m_webrtcClientTraceFileEnv
+      (XOSWEBRTCCLIENT_DEFAULT_WEBRTC_CLIENT_TRACE_FILEENV),
+
+      m_webrtcClientTraceLevels
+      (XOSWEBRTCCLIENT_DEFAULT_WEBRTC_CLIENT_TRACE_LEVELS),
+    
+      m_webrtcVideoVideoCodecMode
+      (XOSWEBRTCCLIENT_DEFAULT_WEBRTC_CLIENT_VIDEO_CODEC_MODE),
+
+      m_windowPeer(0),
+      m_socketServer(0),
+      m_clientPair(0)*/
+    {
+        m_useUIMessageQueue = true;
+        m_postButtonEventUIMessages = true;
+        m_useOpenGLRenderer = false;
+        m_autoConnectToPeerOn = true;
+        m_autoConnectToPeerAfterOn = true;
+    }
+    virtual ~XosWebRtcClientConsoleWindow()
+    {
+    }
+
+    /*virtual bool OnWindowOpened
+    (XosWebRtcClientBaseWindowPeerImplement* windowPeer)
+    {
+        bool isSuccess = false;
+        if ((isSuccess = InitUIMessageThread()))
+        {
+            m_windowPeer = windowPeer;
+            OnOpen();
+        }
+        return isSuccess;
+    }
+    virtual bool OnWindowClosed
+    (XosWebRtcClientBaseWindowPeerImplement* windowPeer)
+    {
+        bool isSuccess = false;
+        OnClose();
+        m_windowPeer = 0;
+        isSuccess = FinishUIMessageThread();
+        return isSuccess;
+    }
+
+    virtual bool OnWindowAttached
+    (XosWebRtcClientBaseWindowPeerImplement* windowPeer)
+    {
+        bool isSuccess = false;
+
+        std::string webrtcClientTraceFileName
+        (GenerateWebRtcClientTraceFileName
+         (m_webrtcClientTraceFileEnv, 
+          m_webrtcClientTraceFileDir, 
+          m_webrtcClientTraceFileName));
+
+        if ((isSuccess = CreateSocketServer(*this)))
+        {
+            if ((m_clientPair = new XosWebRtcClientConnectorPair
+                (*this, webrtcClientTraceFileName, 
+                 m_webrtcClientTraceLevels, m_webrtcVideoVideoCodecMode)))
+            if ((isSuccess = CreateConnectionPair(webrtcClientTraceFileName)))
+            {
+                if ((isSuccess = InitUIMessageThread()))
+                {
+                    m_windowPeer = windowPeer;
+                    OnOpen();
+                    if ((isSuccess = CreateUIMessageThread()))
+                        return isSuccess;
+                    FinishUIMessageThread();
+                    OnClose();
+                    m_windowPeer = 0;
+                }
+                DestroyConnectionPair();
+                delete m_clientPair;
+                m_clientPair = 0;
+            }
+            DestroySocketServer();
+        }
+        return isSuccess;
+    }
+    virtual bool OnWindowDetached
+    (XosWebRtcClientBaseWindowPeerImplement* windowPeer)
+    {
+        bool isSuccess = DestroyUIMessageThread();
+        OnClose();
+        m_windowPeer = 0;
+        if (!(FinishUIMessageThread()))
+            isSuccess = false;
+        if ((m_clientPair))
+        {
+            delete m_clientPair;
+            m_clientPair = 0;
+        }
+        if (!(DestroySocketServer()))
+        if (!(DestroyConnectionPair()))
+            isSuccess = false;
+        return isSuccess;
+    }
+
+    virtual bool CreateConnectionPair
+    (const std::string& webrtcClientTraceFileName)
+    {
+        bool isSuccess = true;
+        if ((isSuccess = CreateSocketServer(*this)))
+        {
+            if ((isSuccess = (0 != (m_clientPair = new XosWebRtcClientConnectorPair
+                (*this, webrtcClientTraceFileName, 
+                 m_webrtcClientTraceLevels, m_webrtcVideoVideoCodecMode)))))
+                return isSuccess;
+            DestroySocketServer();
+        }
+        return isSuccess;
+    }
+    virtual bool DestroyConnectionPair()
+    {
+        bool isSuccess = false;
+        if ((isSuccess = (0 != (m_clientPair))))
+        {
+            delete m_clientPair;
+            m_clientPair = 0;
+        }
+        if (!(DestroySocketServer()))
+            isSuccess = false;
+        return isSuccess;
+    }
+
+    virtual bool CreateSocketServer
+    (XosWebRtcClientBaseWindow& peerWindow)
+    {
+        bool isSuccess = true;
+#if defined(WINDOWS)  
+// Windows 
+#elif defined(MACOSX)  
+// MacOSX
+#else // defined(WINDOWS)  
+// Unix 
+        if ((isSuccess = (0 != (m_socketServer = new XosWebRtcClientSocketServer(peerWindow)))))
+            XosWebRtcClientConnection::SetSocketServer(m_socketServer);
+#endif // defined(WINDOWS)  
+        return isSuccess;
+    }
+    virtual bool DestroySocketServer()
+    {
+        bool isSuccess = true;
+#if defined(WINDOWS)  
+// Windows 
+#elif defined(MACOSX)  
+// MacOSX
+#else // defined(WINDOWS)  
+// Unix 
+        if ((isSuccess = (0 != (m_socketServer))))
+        {
+            XosWebRtcClientConnection::SetSocketServer(0);
+            delete m_socketServer;
+            m_socketServer = 0;
+        }
+#endif // defined(WINDOWS)  
+        return isSuccess;
+    }
+
+    virtual bool CreateUIMessageThread()
+    {
+        bool isSuccess = m_msgThread.CreateMessageThread(this, m_socketServer);
+        return isSuccess;
+    }
+    virtual bool DestroyUIMessageThread()
+    {
+        bool isSuccess = m_msgThread.DestroyMessageThread();
+        return isSuccess;
+    }
+    virtual UIMessageThreadId GetUIMessageThreadId()
+    {
+        return &m_msgThread;
+    }*/
+
+    virtual XosWebRtcClientVideoRenderer* AcquireVideoRenderer
+    (size_t width, size_t height, bool isRemote=false) 
+    { 
+        XosWebRtcClientVideoRenderer* renderer = 0;
+        renderer = new XosWebRtcClientVideoRenderer
+        (width, height, isRemote);
+        return renderer; 
+    }
+    virtual bool ReleaseVideoRenderer
+    (XosWebRtcClientVideoRenderer* renderer) 
+    { 
+        if ((renderer))
+        {
+            delete renderer;
+            return true;
+        }
+        return false; 
+    }
+    virtual bool UpdateWindow() { return true; }
+    virtual bool ValidateWindow() { return true; }
+    virtual bool InvalidateWindow
+    (bool eraseBackground = true) { return true; }
+};
+
+
+#if defined(c_NAMESPACE)
+}
+#endif // defined(c_NAMESPACE) 
+
+#endif // _XOSWEBRTCCLIENTCONSOLEWINDOW_HPP 
