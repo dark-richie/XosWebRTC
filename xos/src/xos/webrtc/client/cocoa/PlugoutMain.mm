@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-/// Copyright 2012, Google Inc.
+/// Copyright 2013, Google Inc.
 ///
 /// Redistribution and use in source and binary forms, with or without
 /// modification, are permitted provided that the following conditions are met:
@@ -23,63 +23,19 @@
 /// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 /// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
-///   File: SocketServer.hpp
+///   File: PlugoutMain.mm
 ///
 /// Author: $author$
-///   Date: 10/20/2012
+///   Date: 3/10/2013
 ///////////////////////////////////////////////////////////////////////
-#ifndef _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
-#define _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
-
-#include "xos/webrtc/talk/base/SocketServer.hpp"
-#include "xos/webrtc/client/Window.hpp"
+#include "xos/webrtc/client/cocoa/PlugoutMain.hh"
 
 namespace xos {
 namespace webrtc {
 namespace client {
+namespace cocoa {
 
-template <class TExtend = talk::base::physical::SocketServer>
-///////////////////////////////////////////////////////////////////////
-///  Class: SocketServer
-///////////////////////////////////////////////////////////////////////
-class _EXPORT_CLASS SocketServer: public TExtend {
-public:
-    typedef TExtend Extends;
-
-    ///////////////////////////////////////////////////////////////////////
-    ///  Constructor: SocketServer
-    ///////////////////////////////////////////////////////////////////////
-    SocketServer(Window& peerWindow):m_peerWindow(peerWindow) {
-    }
-    virtual ~SocketServer() {
-    }
-    virtual bool PeekQuitMessage(int& cms, bool& process_io) { 
-        int msg_id, id;
-        void* data;
-
-        if ((m_peerWindow.PeekUIMessage(msg_id, id, data))) {
-            switch(msg_id) {
-            case Window::UI_THREAD_QUIT:
-                return true;
-                break;
-            default:
-                m_peerWindow.OnUIMessage(msg_id, id, data);
-            }
-        }
-        return false; 
-    }
-protected:
-    Window& m_peerWindow;
-};
-
-namespace physical {
-typedef client::SocketServer<talk::base::physical::SocketServer> SocketServer;
-} // namespace physical
-
+} // namespace cocoa 
 } // namespace client 
 } // namespace webrtc 
 } // namespace xos 
-
-#endif // _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP 
-        
-

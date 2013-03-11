@@ -138,7 +138,10 @@ void Window::SwitchToConnectUI()
             callback_->DisconnectFromServer(true);
         break;
     }
-
+    ChangeStateToConnectToServer();
+}
+void Window::ChangeStateToConnectToServer()
+{
     m_connectToPeerId = -1;
     m_connectToPeerName = "";
 
@@ -386,11 +389,13 @@ void Window::OnDefaultAction(int msg_id, int id, void* data)
         switch(ui_)
         {
         case STREAMING:
-            callback_->DisconnectFromServer();
+            callback_->DisconnectFromServer(true);
+            ChangeStateToConnectToServer();
             break;
 
         case LIST_PEERS:
-            callback_->DisconnectFromServer();
+            callback_->DisconnectFromServer(true);
+            ChangeStateToConnectToServer();
             break;
         }
         break;

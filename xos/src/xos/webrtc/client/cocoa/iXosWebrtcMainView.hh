@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-/// Copyright 2012, Google Inc.
+/// Copyright 2013, Google Inc.
 ///
 /// Redistribution and use in source and binary forms, with or without
 /// modification, are permitted provided that the following conditions are met:
@@ -23,63 +23,61 @@
 /// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 /// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
-///   File: SocketServer.hpp
+///   File: iXosWebrtcMainView.hh
 ///
 /// Author: $author$
-///   Date: 10/20/2012
+///   Date: 3/7/2013
 ///////////////////////////////////////////////////////////////////////
-#ifndef _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
-#define _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
+#ifndef _XOS_WEBRTC_CLIENT_COCOA_IXOSWEBRTCMAINVIEW_HH
+#define _XOS_WEBRTC_CLIENT_COCOA_IXOSWEBRTCMAINVIEW_HH
 
-#include "xos/webrtc/talk/base/SocketServer.hpp"
-#include "xos/webrtc/client/Window.hpp"
+#include "xos/gui/cocoa/iXosWindowMain.hh"
+#include "xos/gui/opengl/cocoa/Context.hh"
+#include "xos/webrtc/client/cocoa/OpenGL.hh"
+#include "xos/webrtc/client/ImageInterface.hpp"
 
 namespace xos {
 namespace webrtc {
 namespace client {
+namespace cocoa {
 
-template <class TExtend = talk::base::physical::SocketServer>
 ///////////////////////////////////////////////////////////////////////
-///  Class: SocketServer
+///  Class: ImageObserver
 ///////////////////////////////////////////////////////////////////////
-class _EXPORT_CLASS SocketServer: public TExtend {
-public:
-    typedef TExtend Extends;
+class _EXPORT_CLASS ImageObserver;
 
-    ///////////////////////////////////////////////////////////////////////
-    ///  Constructor: SocketServer
-    ///////////////////////////////////////////////////////////////////////
-    SocketServer(Window& peerWindow):m_peerWindow(peerWindow) {
-    }
-    virtual ~SocketServer() {
-    }
-    virtual bool PeekQuitMessage(int& cms, bool& process_io) { 
-        int msg_id, id;
-        void* data;
-
-        if ((m_peerWindow.PeekUIMessage(msg_id, id, data))) {
-            switch(msg_id) {
-            case Window::UI_THREAD_QUIT:
-                return true;
-                break;
-            default:
-                m_peerWindow.OnUIMessage(msg_id, id, data);
-            }
-        }
-        return false; 
-    }
-protected:
-    Window& m_peerWindow;
-};
-
-namespace physical {
-typedef client::SocketServer<talk::base::physical::SocketServer> SocketServer;
-} // namespace physical
-
+} // namespace cocoa 
 } // namespace client 
 } // namespace webrtc 
 } // namespace xos 
 
-#endif // _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP 
-        
+#if defined(OBJC)  
+///////////////////////////////////////////////////////////////////////
+/// Interface: iXosWebrtcMainView
+///
+///    Author: $author$
+///      Date: 3/7/2013
+///////////////////////////////////////////////////////////////////////
+@interface iXosWebrtcMainView: NSOpenGLView {
+    void* m_imageData;
+    const char* m_imageFile;
+    unsigned m_imageWidth, m_imageHeight, m_imageDepth, m_imageSize;
+    bool m_invalid;
+    xos::webrtc::client::ImageInterface* m_image;
+    xos::webrtc::client::cocoa::ImageObserver* m_imageObserver;
+    xos::webrtc::client::cocoa::opengl::VideoRenderer m_openglRenderer;
+    }
+    - (id)init:(NSRect)rect;
+    - (void)prepareOpenGL;
+    - (void)reshape;
+    - (void)drawRect:(NSRect)rect;
+    - (void)InvalidateWindow:(bool)eraseBackground;
+    - (void)ValidateWindow;
+    - (void)SetImage:(xos::webrtc::client::ImageInterface*)image;
+    - (void)SetImageFile:(const char*)chars;
+    - (void*)ReadImageFile;
+@end
+#else // defined(OBJC)  
+#endif // defined(OBJC)  
 
+#endif // _XOS_WEBRTC_CLIENT_COCOA_IXOSWEBRTCMAINVIEW_HH 

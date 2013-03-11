@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-/// Copyright 2012, Google Inc.
+/// Copyright 2013, Google Inc.
 ///
 /// Redistribution and use in source and binary forms, with or without
 /// modification, are permitted provided that the following conditions are met:
@@ -23,63 +23,41 @@
 /// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 /// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
-///   File: SocketServer.hpp
+///   File: iXosWebrtcMain.hh
 ///
 /// Author: $author$
-///   Date: 10/20/2012
+///   Date: 3/7/2013
 ///////////////////////////////////////////////////////////////////////
-#ifndef _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
-#define _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
+#ifndef _XOS_WEBRTC_CLIENT_COCOA_IXOSWEBRTCMAIN_HH
+#define _XOS_WEBRTC_CLIENT_COCOA_IXOSWEBRTCMAIN_HH
 
-#include "xos/webrtc/talk/base/SocketServer.hpp"
-#include "xos/webrtc/client/Window.hpp"
+#include "xos/webrtc/client/cocoa/iXosWebrtcMainWindow.hh"
+#include "xos/webrtc/client/cocoa/iXosWebrtcMainView.hh"
+#include "xos/webrtc/client/cocoa/PlugoutMain.hh"
 
-namespace xos {
-namespace webrtc {
-namespace client {
-
-template <class TExtend = talk::base::physical::SocketServer>
+#if defined(OBJC)  
 ///////////////////////////////////////////////////////////////////////
-///  Class: SocketServer
+/// Interface: iXosWebrtcMain
+///
+///    Author: $author$
+///      Date: 3/7/2013
 ///////////////////////////////////////////////////////////////////////
-class _EXPORT_CLASS SocketServer: public TExtend {
-public:
-    typedef TExtend Extends;
-
-    ///////////////////////////////////////////////////////////////////////
-    ///  Constructor: SocketServer
-    ///////////////////////////////////////////////////////////////////////
-    SocketServer(Window& peerWindow):m_peerWindow(peerWindow) {
+@interface iXosWebrtcMain: iXosWindowMain {
+    const char* m_imageFile;
+    xos::webrtc::client::cocoa::PlugoutMain m_webrtcMain;
     }
-    virtual ~SocketServer() {
-    }
-    virtual bool PeekQuitMessage(int& cms, bool& process_io) { 
-        int msg_id, id;
-        void* data;
+    - (iXosMainWindow*)CreateMainWindow:(int)argc argv:(char**)argv env:(char**)env;
+    - (int)BeforeRun:(int)argc argv:(char**)argv env:(char**)env;
+    - (int)AfterRun:(int)argc argv:(char**)argv env:(char**)env;
+    - (int)OnOption:(int)optval optarg:(const char*)optarg optname:(const char*)optname optind:(int)optind 
+               argc:(int)argc argv:(char**)argv env:(char**)env;
+    - (const char*)OptionUsage:(const char*&)optarg longopt:(const struct option*)longopt;
+    - (const char*)Options:(const struct option*&)longopts;
+    - (id)init;
+@end
+#else // defined(OBJC)  
+#endif // defined(OBJC)
 
-        if ((m_peerWindow.PeekUIMessage(msg_id, id, data))) {
-            switch(msg_id) {
-            case Window::UI_THREAD_QUIT:
-                return true;
-                break;
-            default:
-                m_peerWindow.OnUIMessage(msg_id, id, data);
-            }
-        }
-        return false; 
-    }
-protected:
-    Window& m_peerWindow;
-};
-
-namespace physical {
-typedef client::SocketServer<talk::base::physical::SocketServer> SocketServer;
-} // namespace physical
-
-} // namespace client 
-} // namespace webrtc 
-} // namespace xos 
-
-#endif // _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP 
+#endif // _XOS_WEBRTC_CLIENT_COCOA_IXOSWEBRTCMAIN_HH 
         
 

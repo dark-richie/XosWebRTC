@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-/// Copyright 2012, Google Inc.
+/// Copyright 2013, Google Inc.
 ///
 /// Redistribution and use in source and binary forms, with or without
 /// modification, are permitted provided that the following conditions are met:
@@ -26,60 +26,53 @@
 ///   File: SocketServer.hpp
 ///
 /// Author: $author$
-///   Date: 10/20/2012
+///   Date: 3/7/2013
 ///////////////////////////////////////////////////////////////////////
-#ifndef _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
-#define _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP
+#ifndef _XOS_WEBRTC_CLIENT_MACOSX_SOCKETSERVER_HPP
+#define _XOS_WEBRTC_CLIENT_MACOSX_SOCKETSERVER_HPP
 
-#include "xos/webrtc/talk/base/SocketServer.hpp"
-#include "xos/webrtc/client/Window.hpp"
+#include "xos/webrtc/talk/base/macosx/SocketServer.hpp"
+#include "xos/webrtc/client/SocketServer.hpp"
+#include <Cocoa/Cocoa.h>
 
 namespace xos {
 namespace webrtc {
 namespace client {
+namespace macosx {
 
-template <class TExtend = talk::base::physical::SocketServer>
 ///////////////////////////////////////////////////////////////////////
-///  Class: SocketServer
+///  Class: SocketServerT
 ///////////////////////////////////////////////////////////////////////
-class _EXPORT_CLASS SocketServer: public TExtend {
+template <class TExtend>
+class _EXPORT_CLASS SocketServerT: public TExtend {
 public:
     typedef TExtend Extends;
+    ///////////////////////////////////////////////////////////////////////
+    ///  Constructor: SocketServerT
+    ///////////////////////////////////////////////////////////////////////
+    SocketServerT(Window& peerWindow): Extends(peerWindow) {
+    }
+    virtual ~SocketServerT() {
+    }
 
     ///////////////////////////////////////////////////////////////////////
-    ///  Constructor: SocketServer
     ///////////////////////////////////////////////////////////////////////
-    SocketServer(Window& peerWindow):m_peerWindow(peerWindow) {
+    virtual bool Wait(int cms, bool process_io) {
+#if defined(MACOSX_SOCKETSERVER) 
+// Mac SocketServer 
+        NSDate *loopUntil = [NSDate dateWithTimeIntervalSinceNow:0.1];
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:loopUntil];
+#endif // defined(MACOSX_SOCKETSERVER) 
+        return Extends::Wait(cms, process_io);
     }
-    virtual ~SocketServer() {
-    }
-    virtual bool PeekQuitMessage(int& cms, bool& process_io) { 
-        int msg_id, id;
-        void* data;
-
-        if ((m_peerWindow.PeekUIMessage(msg_id, id, data))) {
-            switch(msg_id) {
-            case Window::UI_THREAD_QUIT:
-                return true;
-                break;
-            default:
-                m_peerWindow.OnUIMessage(msg_id, id, data);
-            }
-        }
-        return false; 
-    }
-protected:
-    Window& m_peerWindow;
 };
 
-namespace physical {
-typedef client::SocketServer<talk::base::physical::SocketServer> SocketServer;
-} // namespace physical
+typedef client::SocketServer<talk::base::macosx::SocketServer> SocketServerExtend;
+typedef SocketServerT<SocketServerExtend> SocketServer;
 
+} // namespace macosx 
 } // namespace client 
 } // namespace webrtc 
 } // namespace xos 
 
-#endif // _XOS_WEBRTC_CLIENT_SOCKETSERVER_HPP 
-        
-
+#endif // _XOS_WEBRTC_CLIENT_MACOSX_SOCKETSERVER_HPP 

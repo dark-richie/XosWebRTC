@@ -231,6 +231,7 @@ public:
     // switch state
     ///////////////////////////////////////////////////////////////////////
     virtual void SwitchToConnectUI();
+    virtual void ChangeStateToConnectToServer();
     virtual void SwitchToPeerList(const Peers& peers);
     virtual void SwitchToStreamingUI();
 

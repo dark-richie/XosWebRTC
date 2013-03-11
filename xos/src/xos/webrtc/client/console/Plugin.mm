@@ -28,8 +28,8 @@
 /// Author: $author$
 ///   Date: 2/26/2013
 ///////////////////////////////////////////////////////////////////////
-#include "xos/webrtc/client/Plugin.hpp"
-#include "xos/webrtc/client/Plugin.cpp"
+#include "xos/webrtc/client/console/Plugin.hpp"
+#include "xos/webrtc/client/console/Plugin.cpp"
 
 namespace xos {
 namespace webrtc {
