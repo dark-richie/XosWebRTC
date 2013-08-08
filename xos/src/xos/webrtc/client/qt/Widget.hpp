@@ -31,9 +31,8 @@
 #ifndef _XOS_WEBRTC_CLIENT_QT_WIDGET_HPP
 #define _XOS_WEBRTC_CLIENT_QT_WIDGET_HPP
 
-#include "xos/webrtc/client/qt/VideoRenderer.hpp"
+#include "xos/gui/qt/ImageRenderer.hpp"
 #include "xos/webrtc/client/PluginInterface.hpp"
-#include <QtGui>
 
 namespace xos {
 namespace webrtc {
@@ -134,7 +133,7 @@ protected:
 protected:
     PluginInterface* m_plugin;
     QColor m_bgColor;
-    client::qt::VideoRenderer m_renderer;
+    gui::qt::ImageRenderer m_renderer;
 };
 
 

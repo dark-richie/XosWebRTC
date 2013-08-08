@@ -54,6 +54,9 @@ public:
     typedef PluginImageInterfaceImplement ImageImplements;
     typedef PluginEventInterfaceImplement EventImplements;
 
+    typedef PluginImageInterfaceImplement::Image Image;
+    typedef PluginImageInterfaceImplement::Format ImageFormat;
+
     class _EXPORT_CLASS Window;
 
     ///////////////////////////////////////////////////////////////////////

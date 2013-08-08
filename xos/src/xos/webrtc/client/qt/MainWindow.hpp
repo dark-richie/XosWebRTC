@@ -33,10 +33,9 @@
 
 #include "xos/webrtc/client/qt/opengl/Widget.hpp"
 #include "xos/webrtc/client/qt/Widget.hpp"
-#include "xos/webrtc/client/qt/VideoRenderer.hpp"
 #include "xos/webrtc/client/PluginInterface.hpp"
+#include "xos/gui/qt/ImageRenderer.hpp"
 #include "xos/base/String.hpp"
-#include <QtGui>
 
 #define XOS_WEBRTC_CLIENT_DEFAULT_SERVER_NAME "localhost"
 #define XOS_WEBRTC_CLIENT_DEFAULT_SERVER_PORT 8888
@@ -94,12 +93,13 @@ public:
     ///////////////////////////////////////////////////////////////////////
     // constructor/destructor
     ///////////////////////////////////////////////////////////////////////
-    MainWindow(bool useOpenGLRenderer=false)
+    MainWindow(bool useOpenGLRenderer=false, bool useWindowRenderer=false)
     : m_renderer(this),
       m_paint(0),
-      m_plugin(0), 
+      m_plugin(0),
       m_widget(0),
       m_openglWidget(0),
+      m_useWindowRenderer(useWindowRenderer),
       m_useOpenGLRenderer(useOpenGLRenderer),
       m_autoConnectToPeerOn(false),
       m_serverName(XOS_WEBRTC_CLIENT_DEFAULT_SERVER_NAME),
@@ -132,24 +132,28 @@ public:
         bool success = false;
         if (!(m_plugin)) {
             if ((success = (0 != (m_plugin = LoadPlugin())))) {
+
                 m_plugin->SetAutoConnectToPeerOn(m_autoConnectToPeerOn);
                 m_plugin->SetServerName(m_serverName);
                 m_plugin->SetServerPort(m_serverPort);
                 m_plugin->RegisterImageObserver(this);
                 m_plugin->RegisterEventObserver(this);
-                if (!(m_useOpenGLRenderer)) {
-                    if ((m_widget = new Widget
-                        (m_plugin, this, m_bgColorStreaming))) {
-                        if ((!m_openglWidget) || (m_openglWidget != centralWidget())) {
-                            setCentralWidget(m_widget);
+
+                if (!(m_useWindowRenderer)) {
+                    if (!(m_useOpenGLRenderer)) {
+                        if ((m_widget = new Widget
+                            (m_plugin, this, m_bgColorStreaming))) {
+                            if ((!m_openglWidget) || (m_openglWidget != centralWidget())) {
+                                setCentralWidget(m_widget);
+                            }
                         }
                     }
-                }
-                if ((m_useOpenGLRenderer)) {
-                    if ((m_openglWidget = new opengl::Widget
-                        (m_plugin, this, m_bgColorStreaming))) {
-                        if ((!m_widget) || (m_widget != centralWidget())) {
-                            setCentralWidget(m_openglWidget);
+                    if ((m_useOpenGLRenderer)) {
+                        if ((m_openglWidget = new opengl::Widget
+                            (m_plugin, this, m_bgColorStreaming))) {
+                            if ((!m_widget) || (m_widget != centralWidget())) {
+                                setCentralWidget(m_openglWidget);
+                            }
                         }
                     }
                 }
@@ -239,6 +243,7 @@ protected:
     { 
         int width = this->width();
         int height = this->height();
+        m_renderer.Reshape(width,height);
         if ((m_widget))
             m_widget->Resize();
         if ((m_openglWidget))
@@ -279,8 +284,10 @@ protected:
         else
         if ((m_openglWidget) && (m_openglWidget == centralWidget()))
             m_openglWidget->Show();
-        else 
-        m_paint = &Derives::PaintImage;
+        else  {
+            m_renderer.Reshape(width(),height());
+            m_paint = &Derives::PaintImage;
+        }
         m_bgColor = m_bgColorStreaming;
         OnResize();
         EventImplements::OnChangeStateToStreaming();
@@ -348,6 +355,10 @@ protected:
             break;
         }
         Extends::mouseReleaseEvent(event);
+    }
+    virtual void resizeEvent(QResizeEvent *event) 
+    {
+        OnResize();
     }
     virtual void paintEvent(QPaintEvent *event) 
     {
@@ -440,13 +451,14 @@ protected:
     };
 
 protected:
-    client::qt::VideoRenderer m_renderer;
+    gui::qt::ImageRenderer m_renderer;
     MPaint m_paint;
     PluginInterface* m_plugin;
     Widget* m_widget;
     opengl::Widget* m_openglWidget;
     String m_serverName;
     int m_serverPort;
+    bool m_useWindowRenderer;
     bool m_useOpenGLRenderer;
     bool m_autoConnectToPeerOn;
     QColor m_bgColorUnconnected;

@@ -77,6 +77,7 @@ class _EXPORT_CLASS ImageInterface
 public:
     typedef ImageInterfaceImplement Implements;
 
+    typedef uint8_t Image;
     typedef int Format;
     enum {
         FORMAT_NONE = 0,

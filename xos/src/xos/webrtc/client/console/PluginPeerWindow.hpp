@@ -79,17 +79,26 @@ public:
      bool autoConnectToPeerOn = true, bool autoConnectToPeerAfterOn = true)
     : Extends(plugin, serverName, serverPort, showConnectionState, handleButtonEvents),
       m_imageObserver(0),
-      m_eventObserver(0)
+      m_eventObserver(0),
+      m_localVideo(0),
+      m_remoteVideo(0)
     {
         m_autoConnectToPeerOn = autoConnectToPeerOn;
         m_autoConnectToPeerAfterOn = autoConnectToPeerAfterOn;
+        m_localRendererLock.Create();
+        m_remoteRendererLock.Create();
     }
     virtual ~PluginPeerWindow() {
+        m_remoteRendererLock.Destroy();
+        m_localRendererLock.Destroy();
     }
 
     ///////////////////////////////////////////////////////////////////////
     // Event Observer
     ///////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+    // Change State
+    ////////////////////////////////////////////////////////////////////////
     virtual void OnChangeStateToConnectToServer() { 
         if ((m_eventObserver))
             m_eventObserver->OnChangeStateToConnectToServer();
@@ -114,11 +123,37 @@ public:
         else
         Extends::OnChangeState(toStateName);
     }
+    virtual void OnPeerListItem(const std::string& peerName, int peerId) {
+        if ((m_eventObserver))
+            m_eventObserver->OnPeerListItem(peerName, peerId);
+        else
+        Extends::OnPeerListItem(peerName, peerId);
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Server
+    ////////////////////////////////////////////////////////////////////////
     virtual void OnFailedToConnectToServer(const std::string& server) {
         if ((m_eventObserver))
             m_eventObserver->OnFailedToConnectToServer(server);
         else
         Extends::OnFailedToConnectToServer(server);
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Peer
+    ////////////////////////////////////////////////////////////////////////
+    virtual bool OnPeerConnected(int id, const std::string& name) {
+        if ((m_eventObserver)) {
+            m_eventObserver->OnPeerConnectedToServer(id, name);
+            return false;
+        }
+        return Extends::OnPeerConnected(id, name);
+    }
+    virtual bool OnPeerDisconnected(int id) {
+        if ((m_eventObserver)) {
+            m_eventObserver->OnPeerDisconnectedFromServer(id);
+            return false;
+        }
+        return Extends::OnPeerDisconnected(id);
     }
     ///////////////////////////////////////////////////////////////////////
     // Event Interface
@@ -170,20 +205,20 @@ public:
         uint8_t* image = 0;
         client::VideoRenderer* video;
 
-        if ((video = remote_video_.get())) {
-            video->Lock();
-            if (!(image = video->d_image())) {
-                video->Unlock();
-            } else {
-                width = video->image_width();
-                height = video->image_height();
-                switch(video->RenderImageFormat()) 
-                {
-                case cricket::FOURCC_ARGB:
-                    format = FORMAT_GL_BGRA;
-                default:
-                    format = FORMAT_NONE;
+        if ((LockRemoteRenderer())) {
+            if ((video = remote_video_.get())) {
+                video->Lock();
+                if (!(image = video->d_image())) {
+                    video->Unlock();
+                    UnlockRemoteRenderer();
+                } else {
+                    m_remoteVideo = video;
+                    width = video->image_width();
+                    height = video->image_height();
+                    format = RenderImageFormat(video->RenderImageFormat());
                 }
+            } else {
+                UnlockRemoteRenderer();
             }
         }
         return image;
@@ -192,9 +227,11 @@ public:
         bool success = false;
         client::VideoRenderer* video;
 
-        if ((video = remote_video_.get())) {
+        if ((video = m_remoteVideo)) {
             if (!(image != video->d_image())) {
                 video->Unlock();
+                m_remoteVideo = 0;
+                UnlockRemoteRenderer();
                 success = true;
             }
         }
@@ -206,20 +243,20 @@ public:
         uint8_t* image = 0;
         client::VideoRenderer* video;
 
-        if ((video = local_video_.get())) {
-            video->Lock();
-            if (!(image = video->d_image())) {
-                video->Unlock();
-            } else {
-                width = video->image_width();
-                height = video->image_height();
-                switch(video->RenderImageFormat()) 
-                {
-                case cricket::FOURCC_ARGB:
-                    format = FORMAT_GL_BGRA;
-                default:
-                    format = FORMAT_NONE;
+        if ((LockLocalRenderer())) {
+            if ((video = local_video_.get())) {
+                video->Lock();
+                if (!(image = video->d_image())) {
+                    video->Unlock();
+                    UnlockLocalRenderer();
+                } else {
+                    m_localVideo = video;
+                    width = video->image_width();
+                    height = video->image_height();
+                    format = (video->RenderImageFormat());
                 }
+            } else {
+                UnlockLocalRenderer();
             }
         }
         return image;
@@ -228,33 +265,48 @@ public:
         bool success = false;
         client::VideoRenderer* video;
 
-        if ((video = local_video_.get())) {
+        if ((video = m_localVideo)) {
             if (!(image != video->d_image())) {
                 video->Unlock();
+                m_localVideo = 0;
+                UnlockLocalRenderer();
                 success = true;
             }
         }
         return success;
     }
 
-    virtual uint8_t* GetRemoteImage(int& width, int& height, Format& format) {
-        uint8_t* image = 0;
-        client::VideoRenderer* video;
-        if ((video = remote_video_.get()))
-            image = video->d_image();
-        return image;
+    virtual Format RenderImageFormat(cricket::FourCC fourCC) const {
+        Format format = FORMAT_NONE;
+        switch(fourCC) {
+        case cricket::FOURCC_ARGB:
+            format = FORMAT_GL_BGRA;
+            break;
+        }
+        return format;
     }
-    virtual uint8_t* GetLocalImage(int& width, int& height, Format& format) {
-        uint8_t* image = 0;
-        client::VideoRenderer* video;
-        if ((video = local_video_.get()))
-            image = video->d_image();
-        return image;
+
+    virtual bool LockLocalRenderer() { 
+        return m_localRendererLock.Lock();
+    }
+    virtual bool UnlockLocalRenderer() { 
+        return m_localRendererLock.Unlock(); 
+    }
+
+    virtual bool LockRemoteRenderer() {
+        return m_remoteRendererLock.Lock();
+    }
+    virtual bool UnlockRemoteRenderer() { 
+        return m_remoteRendererLock.Unlock(); 
     }
 
 protected:
     ImageObserverInterface* m_imageObserver;
     EventObserverInterface* m_eventObserver;
+    client::VideoRenderer* m_localVideo;
+    client::VideoRenderer* m_remoteVideo;
+    xos::os::Mutex m_localRendererLock;
+    xos::os::Mutex m_remoteRendererLock;
 };
 
 } // namespace console 

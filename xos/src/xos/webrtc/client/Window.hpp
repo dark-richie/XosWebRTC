@@ -224,6 +224,14 @@ public:
     virtual bool ReleaseVideoRenderer
     (VideoRenderer* renderer) { return false; }
 
+    virtual bool LockLocalRenderer() { return true; }
+    virtual bool UnlockLocalRenderer() { return true; }
+
+    virtual bool LockRemoteRenderer() { return true; }
+    virtual bool UnlockRemoteRenderer() { return true; }
+
+    virtual void ReleaseRenderers();
+
     virtual cricket::VideoRenderer* local_renderer();
     virtual cricket::VideoRenderer* remote_renderer();
 

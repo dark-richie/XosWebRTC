@@ -31,9 +31,9 @@
 #ifndef _XOS_WEBRTC_CLIENT_QT_OPENGL_WIDGET_HPP
 #define _XOS_WEBRTC_CLIENT_QT_OPENGL_WIDGET_HPP
 
-#include "xos/webrtc/client/opengl/VideoRenderer.hpp"
+#include "xos/gui/qt/Gui.hpp"
+#include "xos/gui/opengl/ImageRenderer.hpp"
 #include "xos/webrtc/client/PluginInterface.hpp"
-#include <QtOpenGL>
 
 namespace xos {
 namespace webrtc {
@@ -81,7 +81,7 @@ protected:
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     virtual void initializeGL() {
-        m_openglRenderer.Init();
+        m_openglRenderer.Prepare();
     }
     virtual void resizeGL(int w, int h) {
         m_openglRenderer.Reshape(w, h);
@@ -136,7 +136,7 @@ protected:
 protected:
     PluginInterface* m_plugin;
     QColor m_bgColor;
-    client::opengl::VideoRenderer m_openglRenderer;
+    gui::opengl::ImageRenderer m_openglRenderer;
 };
 
 } // namespace opengl 

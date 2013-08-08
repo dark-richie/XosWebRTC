@@ -43,13 +43,27 @@
 #define XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTVAL_S "g:"
 #define XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTVAL_C 'g'
 
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPT "use-window"
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG_REQUIRED MAIN_OPT_ARGUMENT_NONE
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG "{on | off}"
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG_ON "on"
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG_OFF "off"
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTUSE "Use Window Rendering"
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTVAL_S "w:"
+#define XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTVAL_C 'w'
+
 #define XOS_WEBRTC_CLIENT_QT_MAIN_OPTIONS_CHARS \
-    XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTVAL_S XOS_GUI_QT_MAIN_OPTIONS_CHARS
+    XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTVAL_S \
+    XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTVAL_S \
+    XOS_GUI_QT_MAIN_OPTIONS_CHARS
 
 #define XOS_WEBRTC_CLIENT_QT_MAIN_OPTIONS_OPTIONS \
             {XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPT,\
              XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTARG_REQUIRED, 0,\
              XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTVAL_C},\
+            {XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPT,\
+             XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG_REQUIRED, 0,\
+             XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTVAL_C},\
             XOS_GUI_QT_MAIN_OPTIONS_OPTIONS
 
 namespace xos {
@@ -71,7 +85,8 @@ public:
     ///////////////////////////////////////////////////////////////////////
     Main()
     : m_mainWindow(0), 
-      m_useOpenGLRenderer(false) {
+      m_useOpenGLRenderer(false),
+      m_useWindowRenderer(false) {
     }
     virtual ~Main() {
     }
@@ -83,7 +98,7 @@ public:
     (QApplication& qApplication,
      int argc, char** argv, char** env)
     {
-        if ((m_mainWindow = new MainWindow(m_useOpenGLRenderer))) {
+        if ((m_mainWindow = new MainWindow(m_useOpenGLRenderer, m_useWindowRenderer))) {
             if (!(m_mainWindow->OnWindowOpen())) {
                 delete m_mainWindow;
                 m_mainWindow = 0;
@@ -123,6 +138,13 @@ protected:
                 (XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTARG_ON));
             }
             break;
+        case XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTVAL_C:
+            if ((optarg)) {
+                std::string opt(optarg);
+                m_useWindowRenderer = !(opt.compare
+                (XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG_ON));
+            }
+            break;
         default:
             err = Extends::OnOption
             (optval, optarg, optname, optind, argc, argv, env);
@@ -138,6 +160,10 @@ protected:
         case XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTVAL_C:
             optarg = XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTARG;
             chars = XOS_WEBRTC_CLIENT_QT_MAIN_OPENGL_OPTUSE;
+            break;
+        case XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTVAL_C:
+            optarg = XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTARG;
+            chars = XOS_WEBRTC_CLIENT_QT_MAIN_WINDOW_OPTUSE;
             break;
         default:
             chars = Extends::OptionUsage(optarg, longopt);
@@ -159,6 +185,7 @@ protected:
 protected:
     MainWindow* m_mainWindow;
     bool m_useOpenGLRenderer;
+    bool m_useWindowRenderer;
 };
 
 } // namespace qt 

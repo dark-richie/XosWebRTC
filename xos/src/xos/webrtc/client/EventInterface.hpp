@@ -136,6 +136,11 @@ public:
         if ((delegated = EventObserverInterfaceDelegated()))
             delegated->OnEvent(eventName);
     }
+    virtual void OnPeerListItem(const std::string& peerName, int peerId) {
+        EventObserverInterface* delegated;
+        if ((delegated = EventObserverInterfaceDelegated()))
+            delegated->OnPeerListItem(peerName, peerId);
+    }
     ///////////////////////////////////////////////////////////////////////
     // delegated
     ///////////////////////////////////////////////////////////////////////

@@ -141,6 +141,7 @@ public:
     virtual void OnChangeStateToStreaming() {}
     virtual void OnChangeState(const std::string& toStateName) {}
     virtual void OnEvent(const std::string& eventName) {}
+    virtual void OnPeerListItem(const std::string& peerName, int peerId) {}
 
     virtual bool OnSignedIn(const Peers& peers) { OnEvent("SignedIn"); return false; }
     virtual bool OnDisconnected() { OnEvent("Disconnected"); return false; }

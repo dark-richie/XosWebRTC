@@ -93,11 +93,8 @@ Window::Window
     if ((serverName)) m_serverName = serverName;
     if (0 < (serverPort)) m_serverPort = serverPort;
 }
-Window::~Window()
-{
-    VideoRenderer* renderer;
-    if ((renderer = remote_video_.release())) ReleaseVideoRenderer(renderer);
-    if ((renderer = local_video_.release())) ReleaseVideoRenderer(renderer);
+Window::~Window() {
+    ReleaseRenderers();
 }
 
 bool Window::UpdateWindow() {
@@ -106,6 +103,21 @@ bool Window::UpdateWindow() {
     if (!(gl_renderer_->GetDontUse()))
         gl_renderer_->SwapBuffers();
     return isSuccess;
+}
+
+void Window::ReleaseRenderers() {
+    VideoRenderer* renderer;
+
+    if ((LockRemoteRenderer())) {
+        if ((renderer = remote_video_.release())) 
+            ReleaseVideoRenderer(renderer);
+        UnlockRemoteRenderer();
+    }
+    if ((LockLocalRenderer())) {
+        if ((renderer = local_video_.release())) 
+            ReleaseVideoRenderer(renderer);
+        UnlockLocalRenderer();
+    }
 }
 cricket::VideoRenderer* Window::local_renderer() 
 {
@@ -155,13 +167,11 @@ void Window::ChangeStateToConnectToServer()
 }
 void Window::SwitchToPeerList(const Peers& peers) 
 {
-    VideoRenderer* renderer;
     Peers::const_iterator i;
     std::string peerName;
     int peerId;
 
-    if ((renderer = remote_video_.release())) ReleaseVideoRenderer(renderer);
-    if ((renderer = local_video_.release())) ReleaseVideoRenderer(renderer);
+    ReleaseRenderers();
 
     m_connectToPeerId = -1;
     m_connectToPeerName = "";
@@ -180,6 +190,7 @@ void Window::SwitchToPeerList(const Peers& peers)
         {
             PeerItem peerItem(peerName, peerId);
             m_peerList.push_back(peerItem);
+            OnPeerListItem(peerName, peerId);
         }
     }
 
